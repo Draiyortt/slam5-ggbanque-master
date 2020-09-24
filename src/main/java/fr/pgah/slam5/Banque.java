@@ -11,9 +11,15 @@ public class Banque {
     this.comptes = comptes;
   }
 
-  public int creerCompte(boolean estEtranger) {
+  public int creerCompte(boolean estEtranger, int type) {
     int numCompte = numDernierCompte++;
-    Compte nouveau = new Compte(estEtranger);
+    Compte nouveau;
+    if (type == 1) {
+      nouveau = new CompteEpargne(numCompte, estEtranger);
+    } else {
+      nouveau = new CompteCourant(numCompte, estEtranger);
+    }
+
     comptes.put(numCompte, nouveau);
     return numCompte;
   }
@@ -38,19 +44,15 @@ public class Banque {
     String res = "La banque gère " + numerosDesComptes.size() + " comptes.";
     String provenance;
     for (int num : numerosDesComptes) {
-      if (comptes.get(num).getEstEtranger()) {
-        provenance = "étranger";
-      } else {
-        provenance = "non-étranger";
-      }
-      res += "\n\tCompte " + num + ": solde = " + comptes.get(num).getSolde() + " (" + provenance + ")";
+      res += comptes.get(num).toString();
     }
     return res;
   }
 
   public boolean autoriserEmprunt(int numCompte, int montant) {
-    int solde = comptes.get(numCompte).getSolde();
-    return (solde >= montant / 2);
+    Compte compte = comptes.get(numCompte);
+    return compte.offreGarantiesSuffisantesPour(montant);
+
   }
 
 }
